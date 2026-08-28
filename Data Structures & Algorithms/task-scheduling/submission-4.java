@@ -1,33 +1,37 @@
 class Solution {
     public int leastInterval(char[] tasks, int n) {
-        int time = 0;
         Map<Character, Integer> map = new HashMap<>();
-        Queue<Integer> maxHeap = new PriorityQueue<>(
-            (a, b) -> Integer.compare(b, a)
-        );
-        Queue<int[]> dq = new ArrayDeque<>();
         for (char task : tasks) {
             map.put(task, map.getOrDefault(task, 0) + 1);
         }
+        Queue<Character> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(map.get(b), map.get(a)));
+        Queue<Pair<Character, Integer>> dq = new ArrayDeque<>();
 
-        for (int freq : map.values()) {
-            maxHeap.offer(freq);
+        for (char task : map.keySet()) {
+            maxHeap.offer(task);
         }
 
-        while(!maxHeap.isEmpty() || !dq.isEmpty()) {
+        int time = 0;
+
+        while (!maxHeap.isEmpty() || !dq.isEmpty()) {
+            while (!dq.isEmpty() && time == dq.peek().getValue()) {
+                maxHeap.offer(dq.poll().getKey());
+            }
+
+            if (maxHeap.isEmpty()) {
+                Pair<Character, Integer> pair = dq.poll();
+                time = pair.getValue();
+                maxHeap.offer(pair.getKey());
+            }
+
+            char task = maxHeap.poll();
+            map.put(task, map.get(task) - 1);
+
+            if (map.get(task) > 0) {
+                dq.offer(new Pair<>(task, time + n + 1));
+            }
+            
             time++;
-            if (!maxHeap.isEmpty()) {
-                int task = maxHeap.poll();
-                task--;
-
-                if (task > 0) {
-                    dq.offer(new int[] {time + n, task});
-                }
-            }
-
-            if (!dq.isEmpty() && time == dq.peek()[0]) {
-                maxHeap.offer(dq.poll()[1]);
-            }
         }
 
         return time;
