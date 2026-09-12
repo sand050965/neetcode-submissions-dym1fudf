@@ -1,0 +1,41 @@
+class Solution {
+    public int swimInWater(int[][] grid) {
+        int ROWS = grid.length, COLS = grid[0].length;
+        int result = 0;
+        int[][] dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[2], b[2]));
+        Set<String> visit = new HashSet<>();
+
+        minHeap.offer(new int[] {0, 0, grid[0][0]});
+        
+        while (!minHeap.isEmpty()) {
+            int[] curr = minHeap.poll();
+            int r = curr[0], c = curr[1], val = curr[2];
+            String key = r + "," + c;
+
+            if (visit.contains(key)) {
+                continue;
+            }
+
+            result = val;
+            visit.add(key);
+
+            if (r == ROWS - 1 && c == COLS - 1) {
+                break;
+            }
+
+            for (int[] dir : dirs) {
+                int nr = r + dir[0], nc = c + dir[1];
+                String nkey = nr + "," + nc;
+
+                if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS || visit.contains(nkey)) {
+                    continue;
+                }
+
+                minHeap.offer(new int[] {nr, nc, Math.max(result, grid[nr][nc])});
+            }
+        }
+
+        return result;
+    }
+}
