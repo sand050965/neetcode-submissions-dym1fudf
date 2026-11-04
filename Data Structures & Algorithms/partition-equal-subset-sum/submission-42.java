@@ -1,0 +1,30 @@
+class Solution {
+    public boolean canPartition(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+
+        int sum = Arrays.stream(nums).sum();
+        if (sum % 2 == 1) {
+            return false;
+        }
+
+        int n = nums.length, target = sum / 2;
+        boolean[][] dp = new boolean[n + 1][target + 1];
+        for (int i = 0; i <= n; i++) {
+            dp[i][target] = true;
+        }
+
+        for (int i = n - 1; i >= 0; i--) {
+            int num = nums[i];
+            for (int j = target - 1; j >= 0; j--) {
+                dp[i][j] = dp[i + 1][j];
+                if (j <= target - num) {
+                    dp[i][j] |= dp[i + 1][j + num];
+                }
+            }
+        }
+
+        return dp[0][0];
+    }
+}
